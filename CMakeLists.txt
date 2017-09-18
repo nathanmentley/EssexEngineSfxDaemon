@@ -1,11 +1,11 @@
 #files
 
 file(GLOB EssexEngineSfxDaemon_HEADERS
-    "src/Daemons/Sfx/*.h"
+    "src/Daemons/SfxDaemon/*.h"
 )
 file(GLOB EssexEngineSfxDaemon_SRC
     ${EssexEngineSfxDaemon_HEADERS}
-    "src/Daemons/Sfx/*.cpp"
+    "src/Daemons/SfxDaemon/*.cpp"
 )
 
 #setup headers
