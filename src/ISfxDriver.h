@@ -10,7 +10,16 @@
  */
 #pragma once
 
+#include <string>
+
 #include <EssexEngineCore/IDriver.h>
+#include <EssexEngineCore/WeakPointer.h>
+#include <EssexEngineCore/CachedPointer.h>
+
+#include <EssexEngineFileSystemDaemon/IFileBuffer.h>
+
+#include <EssexEngineSfxDaemon/IMusic.h>
+#include <EssexEngineSfxDaemon/IAudio.h>
 
 namespace EssexEngine{
 namespace Daemons{
@@ -18,6 +27,11 @@ namespace Sfx{
     class ISfxDriver: public Core::IDriver
     {
         public:
+            virtual void PlayAudio(WeakPointer<IAudio> audio) = 0;
+            virtual void PlayMusic(WeakPointer<IMusic> music) = 0;
+        
+            virtual WeakPointer<IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent) = 0;
+            virtual WeakPointer<IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent) = 0;
         private:
     };
 }}};

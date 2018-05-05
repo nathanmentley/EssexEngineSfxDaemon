@@ -10,9 +10,14 @@
  */
 #pragma once
 
-#include <EssexEngineSfxDaemon/ISfxDriver.h>
 #include <EssexEngineCore/BaseDaemon.h>
 #include <EssexEngineCore/LogDaemon.h>
+#include <EssexEngineCore/CachedPointer.h>
+#include <EssexEngineCore/ResourceCache.h>
+
+#include <EssexEngineSfxDaemon/ISfxDriver.h>
+#include <EssexEngineSfxDaemon/MusicCacheKey.h>
+#include <EssexEngineSfxDaemon/AudioCacheKey.h>
 
 namespace EssexEngine{
 namespace Daemons{
@@ -34,6 +39,15 @@ namespace Sfx{
             }
             std::string GetDaemonName() { return "Sfx"; }
             std::string GetDaemonVersion() { return ESSEX_ENGINE_VERSION; }
+            
+            //TODO: support position / movement / effects
+            void PlayAudio(WeakPointer<IAudio> audio);
+            void PlayMusic(WeakPointer<IMusic> music);
+        
+            CachedPointer<AudioCacheKey, IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
+            CachedPointer<MusicCacheKey, IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
         private:
+            Core::Utils::ResourceCache<AudioCacheKey, IAudio> audioCache;
+            Core::Utils::ResourceCache<MusicCacheKey, IMusic> musicCache;
     };
 }}};
