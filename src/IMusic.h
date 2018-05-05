@@ -10,14 +10,10 @@
  */
 #pragma once
 
-#include <EssexEngineCore/IDriver.h>
-
 namespace EssexEngine{
 namespace Daemons{
 namespace Sfx{
-    class ISfxDriver: public Core::IDriver
-    {
-        public:
-        private:
+    class IMusic {
+    public:
     };
 }}};

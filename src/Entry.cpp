@@ -11,6 +11,17 @@
 
 #include <EssexEngineSfxDaemon/SfxDaemon.h>
 
-EssexEngine::Daemons::Sfx::SfxDaemon::SfxDaemon(WeakPointer<Context> _context):BaseDaemon(_context) {}
+using EssexEngine::Context;
+using EssexEngine::WeakPointer;
 
-EssexEngine::Daemons::Sfx::SfxDaemon::~SfxDaemon() {}
+using EssexEngine::Daemons::Sfx::SfxDaemon;
+
+extern "C" {
+    void daemon_init(WeakPointer<Context> context) {
+        context->RegisterDaemon<SfxDaemon>(
+            new SfxDaemon(context)
+        );
+    }
+}
+
+
