@@ -30,7 +30,9 @@ namespace Sfx{
             virtual void PlayAudio(WeakPointer<IAudio> audio) = 0;
             virtual void PlayMusic(WeakPointer<IMusic> music) = 0;
         
-            virtual WeakPointer<IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent) = 0;
+            virtual void SetAudioListenerLocation(int _x, int _y, int _z) = 0;
+            virtual void UpdateAudioPosition(WeakPointer<IAudio> audio, int _x, int _y, int _z) = 0;
+            virtual WeakPointer<IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent, int _x, int _y, int _z) = 0;
             virtual WeakPointer<IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent) = 0;
         private:
     };

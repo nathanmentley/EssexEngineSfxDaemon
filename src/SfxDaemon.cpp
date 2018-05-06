@@ -43,18 +43,36 @@ void SfxDaemon::PlayMusic(WeakPointer<IMusic> music) {
     }
 }
 
-CachedPointer<AudioCacheKey, IAudio> SfxDaemon::GetAudio(CachedPointer<std::string, IFileBuffer> fileContent) {
+void SfxDaemon::UpdateAudioPosition(
+    WeakPointer<IAudio> audio, int _x, int _y, int _z
+) {
+    if(HasDriver()) {
+        GetDriver()->UpdateAudioPosition(audio, _x, _y, _z);
+    }
+}
+
+void SfxDaemon::SetAudioListenerLocation(int _x, int _y, int _z) {
+    if(HasDriver()) {
+        GetDriver()->SetAudioListenerLocation(_x, _y, _z);
+    }
+}
+
+CachedPointer<AudioCacheKey, IAudio> SfxDaemon::GetAudio(
+    CachedPointer<std::string, IFileBuffer> fileContent, int _x, int _y, int _z
+) {
     AudioCacheKey key = AudioCacheKey(fileContent->GetFileName());
 
     if (!audioCache.HasKey(key)) {
-        WeakPointer<IAudio> audio = GetDriver()->GetAudio(std::move(fileContent));
+        WeakPointer<IAudio> audio = GetDriver()->GetAudio(std::move(fileContent), _x, _y, _z);
         audioCache.Cache(key, audio);
     }
 
     return audioCache.Get(key);
 }
 
-CachedPointer<MusicCacheKey, IMusic> SfxDaemon::GetMusic(CachedPointer<std::string, IFileBuffer> fileContent) {
+CachedPointer<MusicCacheKey, IMusic> SfxDaemon::GetMusic(
+    CachedPointer<std::string, IFileBuffer> fileContent
+) {
     MusicCacheKey key = MusicCacheKey(fileContent->GetFileName());
 
     if (!musicCache.HasKey(key)) {

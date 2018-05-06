@@ -40,11 +40,12 @@ namespace Sfx{
             std::string GetDaemonName() { return "Sfx"; }
             std::string GetDaemonVersion() { return ESSEX_ENGINE_VERSION; }
             
-            //TODO: support position / movement / effects
+            void SetAudioListenerLocation(int _x, int _y, int _z);
             void PlayAudio(WeakPointer<IAudio> audio);
             void PlayMusic(WeakPointer<IMusic> music);
         
-            CachedPointer<AudioCacheKey, IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
+            void UpdateAudioPosition(WeakPointer<IAudio> audio, int _x, int _y, int _z);
+            CachedPointer<AudioCacheKey, IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent, int _x, int _y, int _z);
             CachedPointer<MusicCacheKey, IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
         private:
             Core::Utils::ResourceCache<AudioCacheKey, IAudio> audioCache;
