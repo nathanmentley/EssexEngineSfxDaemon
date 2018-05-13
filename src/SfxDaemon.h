@@ -10,11 +10,12 @@
  */
 #pragma once
 
-#include <EssexEngineCore/BaseDaemon.h>
+#include <EssexEngineCore/BaseProcessDaemon.h>
 #include <EssexEngineCore/LogDaemon.h>
 #include <EssexEngineCore/CachedPointer.h>
 #include <EssexEngineCore/ResourceCache.h>
 
+#include <EssexEngineSfxDaemon/SfxDaemonMessage.h>
 #include <EssexEngineSfxDaemon/ISfxDriver.h>
 #include <EssexEngineSfxDaemon/MusicCacheKey.h>
 #include <EssexEngineSfxDaemon/AudioCacheKey.h>
@@ -22,7 +23,7 @@
 namespace EssexEngine{
 namespace Daemons{
 namespace Sfx{
-    class SfxDaemon:public BaseDaemon<ISfxDriver>
+    class SfxDaemon:public BaseProcessDaemon<ISfxDriver, SfxDaemonMessage>
     {
         public:
             SfxDaemon(WeakPointer<Context> _context);
@@ -43,10 +44,17 @@ namespace Sfx{
             void SetAudioListenerLocation(int _x, int _y, int _z);
             void PlayAudio(WeakPointer<IAudio> audio);
             void PlayMusic(WeakPointer<IMusic> music);
-        
             void UpdateAudioPosition(WeakPointer<IAudio> audio, int _x, int _y, int _z);
+
             CachedPointer<AudioCacheKey, IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent, int _x, int _y, int _z);
             CachedPointer<MusicCacheKey, IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
+        protected:
+            void ProcessMessage(WeakPointer<SfxDaemonMessage> message);
+            
+            void _SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message);
+            void _PlayAudio(WeakPointer<SfxDaemonMessage> message);
+            void _PlayMusic(WeakPointer<SfxDaemonMessage> message);
+            void _UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message);
         private:
             Core::Utils::ResourceCache<AudioCacheKey, IAudio> audioCache;
             Core::Utils::ResourceCache<MusicCacheKey, IMusic> musicCache;
