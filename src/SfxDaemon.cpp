@@ -14,6 +14,8 @@
 using EssexEngine::CachedPointer;
 using EssexEngine::WeakPointer;
 
+using EssexEngine::Core::Models::IMessage;
+using EssexEngine::Core::Models::IMessageResponse;
 using EssexEngine::Core::Logging::LogDaemon;
 
 using EssexEngine::Daemons::Sfx::SfxDaemon;
@@ -21,6 +23,7 @@ using EssexEngine::Daemons::Sfx::IAudio;
 using EssexEngine::Daemons::Sfx::IMusic;
 using EssexEngine::Daemons::Sfx::AudioCacheKey;
 using EssexEngine::Daemons::Sfx::MusicCacheKey;
+using EssexEngine::Daemons::Sfx::SfxDaemonMessageResponse;
 using EssexEngine::Daemons::Sfx::Messages::MessageType;
 
 using EssexEngine::Daemons::FileSystem::IFileBuffer;
@@ -60,9 +63,20 @@ CachedPointer<MusicCacheKey, IMusic> SfxDaemon::GetMusic(
 }
 
 // message generators
+void SfxDaemon::SetupSfx() {
+    PushMessage(
+        WeakPointer<IMessage>(
+            new SfxDaemonMessage(
+                MessageType::SetupSfx,
+                WeakPointer<void>()
+            )
+        )
+    );
+}
+
 void SfxDaemon::PlayAudio(WeakPointer<IAudio> audio) {
     PushMessage(
-        WeakPointer<SfxDaemonMessage>(
+        WeakPointer<IMessage>(
             new SfxDaemonMessage(
                 MessageType::PlayAudio,
                 audio.Cast<void>()
@@ -73,7 +87,7 @@ void SfxDaemon::PlayAudio(WeakPointer<IAudio> audio) {
 
 void SfxDaemon::PlayMusic(WeakPointer<IMusic> music) {
     PushMessage(
-        WeakPointer<SfxDaemonMessage>(
+        WeakPointer<IMessage>(
             new SfxDaemonMessage(
                 MessageType::PlayMusic,
                 music.Cast<void>()
@@ -86,7 +100,7 @@ void SfxDaemon::UpdateAudioPosition(
     WeakPointer<IAudio> audio, int _x, int _y, int _z
 ) {
     PushMessage(
-        WeakPointer<SfxDaemonMessage>(
+        WeakPointer<IMessage>(
             new SfxDaemonMessage(
                 MessageType::UpdateAudioPosition,
                 audio.Cast<void>(),
@@ -100,7 +114,7 @@ void SfxDaemon::UpdateAudioPosition(
 
 void SfxDaemon::SetAudioListenerLocation(int _x, int _y, int _z) {
     PushMessage(
-        WeakPointer<SfxDaemonMessage>(
+        WeakPointer<IMessage>(
             new SfxDaemonMessage(
                 MessageType::SetAudioListenerLocation,
                 WeakPointer<void>(),
@@ -113,25 +127,37 @@ void SfxDaemon::SetAudioListenerLocation(int _x, int _y, int _z) {
 }
 
 //message parser
-void SfxDaemon::ProcessMessage(WeakPointer<SfxDaemonMessage> message) {
+WeakPointer<IMessageResponse> SfxDaemon::ProcessMessage(WeakPointer<IMessage> message) {
     switch(message->GetType()) {
+        case MessageType::SetupSfx:
+            return _SetupSfx(message.Cast<SfxDaemonMessage>()).Cast<IMessageResponse>();
         case MessageType::SetAudioListenerLocation:
-            _SetAudioListenerLocation(message);
-            break;
+            return _SetAudioListenerLocation(message.Cast<SfxDaemonMessage>()).Cast<IMessageResponse>();
         case MessageType::PlayAudio:
-            _PlayAudio(message);
-            break;
+            return _PlayAudio(message.Cast<SfxDaemonMessage>()).Cast<IMessageResponse>();
         case MessageType::PlayMusic:
-            _PlayMusic(message);
-            break;
+            return _PlayMusic(message.Cast<SfxDaemonMessage>()).Cast<IMessageResponse>();
         case MessageType::UpdateAudioPosition:
-            _UpdateAudioPosition(message);
-            break;
+            return _UpdateAudioPosition(message.Cast<SfxDaemonMessage>()).Cast<IMessageResponse>();
     }
+
+    return WeakPointer<IMessageResponse>(
+        new IMessageResponse()
+    );
 }
 
 //message logic
-void SfxDaemon::_SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message) {
+WeakPointer<SfxDaemonMessageResponse> SfxDaemon::_SetupSfx(WeakPointer<SfxDaemonMessage> message) {
+    if(HasDriver()) {
+        GetDriver()->SetupSfx();
+    }
+
+    return WeakPointer<SfxDaemonMessageResponse>(
+        new SfxDaemonMessageResponse()
+    );
+}
+
+WeakPointer<SfxDaemonMessageResponse> SfxDaemon::_SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message) {
     if(HasDriver()) {
         if(
             message->GetX().HasValue() &&
@@ -145,25 +171,37 @@ void SfxDaemon::_SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message)
             );
         }
     }
+
+    return WeakPointer<SfxDaemonMessageResponse>(
+        new SfxDaemonMessageResponse()
+    );
 }
 
-void SfxDaemon::_PlayAudio(WeakPointer<SfxDaemonMessage> message) {
+WeakPointer<SfxDaemonMessageResponse> SfxDaemon::_PlayAudio(WeakPointer<SfxDaemonMessage> message) {
     if(HasDriver()) {
         if(message->GetData().HasValue()) {
             GetDriver()->PlayAudio(message->GetData().Cast<IAudio>());
         }
     }
+
+    return WeakPointer<SfxDaemonMessageResponse>(
+        new SfxDaemonMessageResponse()
+    );
 }
 
-void SfxDaemon::_PlayMusic(WeakPointer<SfxDaemonMessage> message) {
+WeakPointer<SfxDaemonMessageResponse> SfxDaemon::_PlayMusic(WeakPointer<SfxDaemonMessage> message) {
     if(HasDriver()) {
         if(message->GetData().HasValue()) {
             GetDriver()->PlayMusic(message->GetData().Cast<IMusic>());
         }
     }
+
+    return WeakPointer<SfxDaemonMessageResponse>(
+        new SfxDaemonMessageResponse()
+    );
 }
 
-void SfxDaemon::_UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message) {
+WeakPointer<SfxDaemonMessageResponse> SfxDaemon::_UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message) {
     if(HasDriver()) {
         if(
             message->GetData().HasValue() &&
@@ -179,4 +217,8 @@ void SfxDaemon::_UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message) {
             );
         }
     }
+
+    return WeakPointer<SfxDaemonMessageResponse>(
+        new SfxDaemonMessageResponse()
+    );
 }

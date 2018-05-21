@@ -10,7 +10,8 @@
  */
 #pragma once
 
-#include <EssexEngineCore/IMessage.h>
+#include <EssexEngineCore/BaseMessage.h>
+#include <EssexEngineCore/IMessageResponse.h>
 #include <EssexEngineCore/WeakPointer.h>
 
 namespace EssexEngine{
@@ -18,14 +19,20 @@ namespace Daemons{
 namespace Sfx{
     namespace Messages {
         enum MessageType {
-            SetAudioListenerLocation = 1,
-            PlayAudio = 2,
-            PlayMusic = 3,
-            UpdateAudioPosition = 4
+            SetupSfx = 1,
+            SetAudioListenerLocation = 2,
+            PlayAudio = 3,
+            PlayMusic = 4,
+            UpdateAudioPosition = 5
         };
     }
 
-    class SfxDaemonMessage: public Core::IMessage
+    class SfxDaemonMessageResponse: public Core::Models::IMessageResponse
+    {
+
+    };
+
+    class SfxDaemonMessage: public Core::Models::BaseMessage<SfxDaemonMessageResponse>
     {
         public:
             SfxDaemonMessage(
@@ -35,7 +42,7 @@ namespace Sfx{
                 Nullable<int> _y = Nullable<int>(),
                 Nullable<int> _z = Nullable<int>()
             ):
-            Core::IMessage() {
+            Core::Models::BaseMessage<SfxDaemonMessageResponse>() {
                 type = _type;
                 data = _data;
 
@@ -44,7 +51,7 @@ namespace Sfx{
                 z = _z;
             }
 
-            Messages::MessageType GetType() {
+            int GetType() {
                 return type;
             }
 

@@ -23,7 +23,7 @@
 namespace EssexEngine{
 namespace Daemons{
 namespace Sfx{
-    class SfxDaemon:public BaseProcessDaemon<ISfxDriver, SfxDaemonMessage>
+    class SfxDaemon:public BaseProcessDaemon<ISfxDriver>
     {
         public:
             SfxDaemon(WeakPointer<Context> _context);
@@ -41,6 +41,7 @@ namespace Sfx{
             std::string GetDaemonName() { return "Sfx"; }
             std::string GetDaemonVersion() { return ESSEX_ENGINE_VERSION; }
             
+            void SetupSfx();
             void SetAudioListenerLocation(int _x, int _y, int _z);
             void PlayAudio(WeakPointer<IAudio> audio);
             void PlayMusic(WeakPointer<IMusic> music);
@@ -49,12 +50,13 @@ namespace Sfx{
             CachedPointer<AudioCacheKey, IAudio> GetAudio(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent, int _x, int _y, int _z);
             CachedPointer<MusicCacheKey, IMusic> GetMusic(CachedPointer<std::string, FileSystem::IFileBuffer> fileContent);
         protected:
-            void ProcessMessage(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<Core::Models::IMessageResponse> ProcessMessage(WeakPointer<Core::Models::IMessage> message);
             
-            void _SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message);
-            void _PlayAudio(WeakPointer<SfxDaemonMessage> message);
-            void _PlayMusic(WeakPointer<SfxDaemonMessage> message);
-            void _UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<SfxDaemonMessageResponse> _SetupSfx(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<SfxDaemonMessageResponse> _SetAudioListenerLocation(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<SfxDaemonMessageResponse> _PlayAudio(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<SfxDaemonMessageResponse> _PlayMusic(WeakPointer<SfxDaemonMessage> message);
+            WeakPointer<SfxDaemonMessageResponse> _UpdateAudioPosition(WeakPointer<SfxDaemonMessage> message);
         private:
             Core::Utils::ResourceCache<AudioCacheKey, IAudio> audioCache;
             Core::Utils::ResourceCache<MusicCacheKey, IMusic> musicCache;

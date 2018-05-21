@@ -27,6 +27,8 @@ namespace Sfx{
     class ISfxDriver: public Core::IDriver
     {
         public:
+            virtual void SetupSfx() = 0;
+
             virtual void PlayAudio(WeakPointer<IAudio> audio) = 0;
             virtual void PlayMusic(WeakPointer<IMusic> music) = 0;
         
